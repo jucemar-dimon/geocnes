@@ -1,9 +1,8 @@
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const Dotenv = require('dotenv-webpack')
 const modoDev = process.env.NODE_ENV !== 'production'
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-const OptimizedCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const Dotenv = require('dotenv-webpack');
 
 module.exports = {
     mode: modoDev ? 'development' : 'production',
@@ -11,36 +10,31 @@ module.exports = {
     output: {
         filename: 'main.js',
         path: __dirname + '/public'
-
     },
 
     devServer: {
-        contentBase: './public',
+        static: './public',
         port: 9000
-
     },
-
 
     optimization: {
+        // '...' mantém o minificador de JS padrão (terser) do Webpack 5
         minimizer: [
-            new UglifyJsPlugin({
-                cache: true,
-                parallel: true
-            }),
-            new OptimizedCssAssetsPlugin({})
+            '...',
+            new CssMinimizerPlugin()
         ]
     },
-
 
     plugins: [
         new MiniCSSExtractPlugin({
             filename: 'estilo.css'
         }),
         new Dotenv(),
-        new CopyWebpackPlugin([
-            { from: './src/assets/images', to: 'images' }
-        ])
-
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: './src/assets/images', to: 'images' }
+            ]
+        })
     ],
     module: {
         rules: [
@@ -54,9 +48,7 @@ module.exports = {
             },
             {
                 test: /\.(ico|svg|jpg|png|gif|PNG)$/,
-                use: [
-                    'file-loader'
-                ]
+                type: 'asset/resource'
             }
         ]
     }
