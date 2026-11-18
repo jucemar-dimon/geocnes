@@ -29,10 +29,12 @@ module.exports = {
         new MiniCSSExtractPlugin({
             filename: 'estilo.css'
         }),
-        new Dotenv(),
+        // systemvars: no GitHub Actions a chave vem de um Secret, não de um .env
+        new Dotenv({ systemvars: true }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: './src/assets/images', to: 'images' }
+                { from: './src/assets/images', to: 'images' },
+                { from: './src/static', to: '.' }
             ]
         })
     ],
